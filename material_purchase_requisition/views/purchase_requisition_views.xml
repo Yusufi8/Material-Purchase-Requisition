@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ====================================================
+         TREE / LIST VIEW
+    ==================================================== -->
+    <record id="view_purchase_requisition_tree" model="ir.ui.view">
+        <field name="name">purchase.requisition.request.tree</field>
+        <field name="model">purchase.requisition.request</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'"
+                  decoration-warning="state in ('submitted','approved')"
+                  decoration-success="state in ('rfq_created','done')"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="required_date"/>
+                <field name="department_id"/>
+                <field name="requested_by"/>
+                <field name="material_requisition_id"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state in ('submitted','approved')"
+                       decoration-success="state in ('rfq_created','done')"
+                       decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ====================================================
+         FORM VIEW
+    ==================================================== -->
+    <record id="view_purchase_requisition_form" model="ir.ui.view">
+        <field name="name">purchase.requisition.request.form</field>
+        <field name="model">purchase.requisition.request</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Requisition">
+
+                <header>
+                    <button name="action_submit"
+                            string="Submit for Approval"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
+                    <button name="action_approve"
+                            string="Approve"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', 'not in', ['submitted'])]}"/>
+                    <button name="action_create_rfq"
+                            string="Create RFQ"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', 'not in', ['approved'])]}"/>
+                    <button name="action_done"
+                            string="Mark as Done"
+                            type="object"
+                            attrs="{'invisible': [('state', 'not in', ['rfq_created'])]}"/>
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            attrs="{'invisible': [('state', 'in', ['cancelled','done'])]}"/>
+                    <button name="action_reset_draft"
+                            string="Reset to Draft"
+                            type="object"
+                            attrs="{'invisible': [('state', 'not in', ['cancelled','submitted'])]}"/>
+
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,rfq_created,done"/>
+                </header>
+
+                <sheet>
+                    <!-- Smart Buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_orders"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-bag"
+                                attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                            <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
+                        </button>
+                        <button name="action_view_receipts"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                attrs="{'invisible': [('receipt_count', '=', 0)]}">
+                            <field name="receipt_count" widget="statinfo" string="Receipts"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Request Info">
+                            <field name="request_date"/>
+                            <field name="required_date"/>
+                            <field name="department_id"/>
+                            <field name="material_requisition_id"/>
+                        </group>
+                        <group string="Requested By">
+                            <field name="requested_by"
+                                   attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="justification"
+                               placeholder="Explain why these items are needed…"
+                               attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Items Required" name="lines">
+                            <field name="line_ids"
+                                   attrs="{'readonly': [('state', 'not in', ['draft'])]}">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="requested_qty"/>
+                                    <field name="available_qty" readonly="1"/>
+                                    <field name="shortage_qty" readonly="1"/>
+                                    <field name="estimated_cost" readonly="1"/>
+                                    <field name="total_cost" readonly="1"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Purchase Orders" name="pos"
+                              attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                            <field name="purchase_order_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                    <field name="date_order"/>
+                                    <field name="amount_total"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- ====================================================
+         SEARCH VIEW
+    ==================================================== -->
+    <record id="view_purchase_requisition_search" model="ir.ui.view">
+        <field name="name">purchase.requisition.request.search</field>
+        <field name="model">purchase.requisition.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Purchase Requisitions">
+                <field name="name" string="PR No"/>
+                <field name="requested_by"/>
+                <field name="department_id"/>
+                <field name="material_requisition_id"/>
+                <separator/>
+                <filter name="my_prs" string="My PRs" domain="[('requested_by', '=', uid)]"/>
+                <filter name="pending_approval" string="Pending Approval"
+                        domain="[('state','=','submitted')]"/>
+                <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                <filter name="rfq" string="RFQ Created" domain="[('state','=','rfq_created')]"/>
+                <filter name="done" string="Done" domain="[('state','=','done')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="grp_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="grp_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

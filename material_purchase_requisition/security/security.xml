@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+        NOTE: category_id is intentionally omitted from all groups below.
+
+        In Odoo 16 Community, app-level module categories
+        (Purchase, Manufacturing, Inventory) are created dynamically
+        by each app and do NOT have guaranteed stable external IDs
+        that can be referenced as base.module_category_*.
+
+        Removing category_id is safe: it is cosmetic only (controls
+        which section the group appears under in Settings > Users & Companies).
+        All permission logic works identically without it.
+    -->
+
+    <!-- ============================================================
+         Group 1 — Production Supervisor
+         Creates material requests; sees own requisitions only.
+    ============================================================ -->
+    <record id="group_production_supervisor" model="res.groups">
+        <field name="name">Production Supervisor</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- ============================================================
+         Group 2 — Inventory Manager (Requisition)
+         Reviews all MRs, checks stock, issues materials, raises PRs.
+    ============================================================ -->
+    <record id="group_inventory_manager" model="res.groups">
+        <field name="name">Inventory Manager (Requisition)</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- ============================================================
+         Group 3 — Purchase User (Requisition)
+         Receives approved PRs, creates RFQs, places purchase orders.
+         Inherits all rights of Odoo's built-in purchase.group_purchase_user.
+    ============================================================ -->
+    <record id="group_purchase_user_custom" model="res.groups">
+        <field name="name">Purchase User (Requisition)</field>
+        <field name="implied_ids" eval="[(4, ref('purchase.group_purchase_user'))]"/>
+    </record>
+
+    <!-- ============================================================
+         Group 4 — Purchase Manager (Requisition)
+         Approves PRs; inherits purchase.group_purchase_manager rights.
+    ============================================================ -->
+    <record id="group_purchase_manager_custom" model="res.groups">
+        <field name="name">Purchase Manager (Requisition)</field>
+        <field name="implied_ids" eval="[(4, ref('purchase.group_purchase_manager'))]"/>
+    </record>
+
+</odoo>

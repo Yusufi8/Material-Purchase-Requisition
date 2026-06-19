@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         MANUFACTURING  (mrp.menu_mrp_root)
+         Production Supervisor: request materials, track own requests
+    ============================================================ -->
+
+    <menuitem
+        id="menu_mrp_requisition_group"
+        name="Material Requisitions"
+        parent="mrp.menu_mrp_root"
+        sequence="60"/>
+
+    <menuitem
+        id="menu_mrp_request_materials"
+        name="Request Materials"
+        parent="menu_mrp_requisition_group"
+        action="action_material_requisition_wizard"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_mrp_my_requisitions"
+        name="My Requisitions"
+        parent="menu_mrp_requisition_group"
+        action="action_material_requisition_mine"
+        sequence="20"/>
+
+    <!-- ============================================================
+         INVENTORY  (stock.menu_stock_root)
+         Inventory Manager: review all requests, check availability,
+         issue materials, raise shortages to Purchase
+    ============================================================ -->
+
+    <menuitem
+        id="menu_stock_requisition_group"
+        name="Material Requisitions"
+        parent="stock.menu_stock_root"
+        sequence="65"/>
+
+    <menuitem
+        id="menu_stock_pending_review"
+        name="Pending Review"
+        parent="menu_stock_requisition_group"
+        action="action_material_requisition_pending_review"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_stock_all_requisitions"
+        name="All Requisitions"
+        parent="menu_stock_requisition_group"
+        action="action_material_requisition_all"
+        sequence="20"/>
+
+    <!-- ============================================================
+         PURCHASE  (purchase.menu_purchase_root)
+         Purchase Team: approve requisitions, generate RFQs
+    ============================================================ -->
+
+    <menuitem
+        id="menu_purchase_requisition_group"
+        name="Material Purchase Requisitions"
+        parent="purchase.menu_purchase_root"
+        sequence="65"/>
+
+    <menuitem
+        id="menu_purchase_pending_approval"
+        name="Pending Approval"
+        parent="menu_purchase_requisition_group"
+        action="action_purchase_requisition_pending"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_purchase_all_requisitions"
+        name="All Purchase Requisitions"
+        parent="menu_purchase_requisition_group"
+        action="action_purchase_requisition_all"
+        sequence="20"/>
+
+</odoo>
