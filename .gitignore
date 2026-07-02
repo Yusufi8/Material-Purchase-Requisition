@@ -1,0 +1,10 @@
+# Python/Odoo generated files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Local/runtime files
+*.log
+.env
+.venv/
+venv/
