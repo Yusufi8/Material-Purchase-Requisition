@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ====================================================
+         TREE / LIST VIEW
+    ==================================================== -->
+    <record id="view_purchase_requisition_tree" model="ir.ui.view">
+        <field name="name">purchase.requisition.request.tree</field>
+        <field name="model">purchase.requisition.request</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'"
+                  decoration-warning="state in ('submitted','purchase_manager_review','director_approval')"
+                  decoration-success="state in ('approved','rfq_created','po_created','waiting_receipt','partially_received','received','done')"
+                  decoration-danger="estimated_cost &gt;= 200000"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="request_date"/>
+                <field name="required_date"/>
+                <field name="department_id"/>
+                <field name="requested_by"/>
+                <field name="material_requisition_id"/>
+                <field name="estimated_cost" sum="Total Estimated"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state in ('submitted','purchase_manager_review','director_approval')"
+                       decoration-success="state in ('approved','rfq_created','po_created','waiting_receipt','partially_received','received','done')"
+                       decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ====================================================
+         FORM VIEW
+    ==================================================== -->
+    <record id="view_purchase_requisition_form" model="ir.ui.view">
+        <field name="name">purchase.requisition.request.form</field>
+        <field name="model">purchase.requisition.request</field>
+        <field name="arch" type="xml">
+            <form string="Purchase Requisition">
+
+                <header>
+                    <button name="action_submit"
+                            string="Submit for Approval"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_purchase_manager_review"
+                            string="Start Review"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'submitted')]}"/>
+                    <button name="action_send_for_director_approval"
+                            string="Send for Director Approval"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'purchase_manager_review')]}"/>
+
+                    <!-- Director decisions: open the shared ti_workflow_core wizard -->
+                    <button name="%(action_pr_director_approve_wizard)d"
+                            string="Director Approve"
+                            type="action"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'director_approval')]}"/>
+                    <button name="%(action_pr_director_reject_wizard)d"
+                            string="Director Reject"
+                            type="action"
+                            attrs="{'invisible': [('state', '!=', 'director_approval')]}"/>
+
+                    <button name="action_create_rfq"
+                            string="Create RFQ"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'approved')]}"/>
+                    <button name="action_confirm_po"
+                            string="Confirm PO"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'rfq_created')]}"/>
+                    <button name="action_mark_waiting_receipt"
+                            string="Mark Waiting Receipt"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'po_created')]}"/>
+                    <button name="action_mark_received"
+                            string="Mark Received"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', 'not in', ['waiting_receipt','partially_received'])]}"/>
+                    <button name="action_done"
+                            string="Mark as Done"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'received')]}"/>
+
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            attrs="{'invisible': [('state', 'in', ['cancelled','done'])]}"/>
+                    <button name="action_reset_draft"
+                            string="Reset to Draft"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,purchase_manager_review,director_approval,approved,rfq_created,po_created,waiting_receipt,received,done"/>
+                </header>
+
+                <sheet>
+                    <!-- Smart Buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_purchase_orders"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-shopping-bag"
+                                attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                            <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
+                        </button>
+                        <button name="action_view_receipts"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                attrs="{'invisible': [('receipt_count', '=', 0)]}">
+                            <field name="receipt_count" widget="statinfo" string="Receipts"/>
+                        </button>
+                        <button name="action_view_audit_log"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-history">
+                            <field name="audit_log_count" widget="statinfo" string="Audit Log"/>
+                        </button>
+                        <button name="action_view_timeline"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-clock-o">
+                            <field name="timeline_count" widget="statinfo" string="Timeline"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="High Value (≥ ₹2,00,000)"
+                            bg_color="bg-danger"
+                            attrs="{'invisible': [('estimated_cost', '&lt;', 200000)]}"/>
+                    <widget name="web_ribbon" title="Cancelled"
+                            bg_color="bg-danger"
+                            attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Request Info">
+                            <field name="request_date"/>
+                            <field name="required_date"/>
+                            <field name="department_id"/>
+                            <field name="material_requisition_id" readonly="1"/>
+                        </group>
+                        <group string="Requested By">
+                            <field name="requested_by"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="estimated_cost"/>
+                            <field name="actual_cost"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                        </group>
+                    </group>
+
+                    <group string="Business References">
+                        <group>
+                            <field name="sale_order_id"/>
+                            <field name="project_id"/>
+                        </group>
+                        <group>
+                            <field name="manufacturing_order_id"/>
+                            <field name="work_order_id"/>
+                            <field name="cost_center_id"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="justification"
+                               placeholder="Explain why these items are needed…"
+                               attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Items Required" name="lines">
+                            <field name="line_ids"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="uom_id"/>
+                                    <field name="requested_qty"/>
+                                    <field name="available_qty" readonly="1"/>
+                                    <field name="shortage_qty" readonly="1"/>
+                                    <field name="estimated_cost" readonly="1"/>
+                                    <field name="total_cost" readonly="1" sum="Total Est."/>
+                                    <field name="actual_cost"/>
+                                    <field name="remarks"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Director Approval" name="director"
+                              attrs="{'invisible': [('director_id', '=', False)]}">
+                            <group>
+                                <group>
+                                    <field name="director_id"/>
+                                    <field name="director_approval_date"/>
+                                </group>
+                                <group>
+                                    <field name="director_remarks"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Purchase Orders" name="pos"
+                              attrs="{'invisible': [('purchase_order_count', '=', 0)]}">
+                            <field name="purchase_order_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="partner_id"/>
+                                    <field name="date_order"/>
+                                    <field name="amount_total"/>
+                                    <field name="state"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- ====================================================
+         SEARCH VIEW
+    ==================================================== -->
+    <record id="view_purchase_requisition_search" model="ir.ui.view">
+        <field name="name">purchase.requisition.request.search</field>
+        <field name="model">purchase.requisition.request</field>
+        <field name="arch" type="xml">
+            <search string="Search Purchase Requisitions">
+                <field name="name" string="PR No"/>
+                <field name="requested_by"/>
+                <field name="department_id"/>
+                <field name="material_requisition_id"/>
+                <field name="sale_order_id"/>
+                <field name="project_id"/>
+                <separator/>
+                <filter name="my_prs" string="My PRs" domain="[('requested_by', '=', uid)]"/>
+                <filter name="pending_approval" string="Pending Approval"
+                        domain="[('state','in',['submitted','purchase_manager_review'])]"/>
+                <filter name="director_queue" string="Awaiting Director"
+                        domain="[('state','=','director_approval')]"/>
+                <filter name="approved" string="Approved" domain="[('state','=','approved')]"/>
+                <filter name="rfq" string="RFQ Created" domain="[('state','=','rfq_created')]"/>
+                <filter name="waiting_receipt" string="Waiting Receipt"
+                        domain="[('state','in',['waiting_receipt','partially_received'])]"/>
+                <filter name="done" string="Done" domain="[('state','=','done')]"/>
+                <separator/>
+                <filter name="high_value" string="High Value (≥ ₹2,00,000)"
+                        domain="[('estimated_cost', '&gt;=', 200000)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="grp_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="grp_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="grp_mr" string="Source MR" context="{'group_by': 'material_requisition_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

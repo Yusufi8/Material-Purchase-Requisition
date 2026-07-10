@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ti_workflow_log_user,ti.workflow.log.user,model_ti_workflow_log,base.group_user,1,0,0,0
+access_ti_workflow_log_admin,ti.workflow.log.admin,model_ti_workflow_log,group_system_admin,1,0,0,0
+access_ti_document_timeline_user,ti.document.timeline.user,model_ti_document_timeline,base.group_user,1,0,0,0
+access_ti_document_timeline_admin,ti.document.timeline.admin,model_ti_document_timeline,group_system_admin,1,0,0,0
+access_ti_approval_route_admin,ti.approval.route.admin,model_ti_approval_route,group_system_admin,1,1,1,1
+access_ti_approval_route_inventory_mgr,ti.approval.route.inventory.mgr,model_ti_approval_route,group_inventory_manager,1,0,0,0
+access_ti_approval_route_purchase_mgr,ti.approval.route.purchase.mgr,model_ti_approval_route,group_purchase_manager,1,0,0,0
+access_ti_approval_route_ops_director,ti.approval.route.ops.director,model_ti_approval_route,group_operations_director,1,0,0,0
+access_ti_approval_route_md,ti.approval.route.md,model_ti_approval_route,group_managing_director,1,0,0,0
+access_ti_notification_rule_admin,ti.notification.rule.admin,model_ti_notification_rule,group_system_admin,1,1,1,1
+access_ti_notification_rule_inventory_mgr,ti.notification.rule.inventory.mgr,model_ti_notification_rule,group_inventory_manager,1,0,0,0
+access_ti_notification_rule_purchase_mgr,ti.notification.rule.purchase.mgr,model_ti_notification_rule,group_purchase_manager,1,0,0,0
+access_ti_notification_rule_ops_director,ti.notification.rule.ops.director,model_ti_notification_rule,group_operations_director,1,0,0,0
+access_ti_notification_rule_md,ti.notification.rule.md,model_ti_notification_rule,group_managing_director,1,0,0,0
+access_ti_approval_action_wizard_user,ti.approval.action.wizard.user,model_ti_approval_action_wizard,base.group_user,1,1,1,1

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_material_requisition_form_inherit_inventory" model="ir.ui.view">
+        <field name="name">material.requisition.form.inherit.inventory</field>
+        <field name="model">material.requisition</field>
+        <field name="inherit_id" ref="ti_material_requisition.view_material_requisition_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Partial issue: alternative to the one-shot "Issue Materials" button -->
+            <xpath expr="//button[@name='action_issue_materials']" position="after">
+                <button name="%(action_mr_issue_partial_wizard)d"
+                        string="Issue (Partial)"
+                        type="action"
+                        attrs="{'invisible': [('state', 'not in', ['ready_to_issue','stock_reserved','director_approved'])]}"/>
+            </xpath>
+
+            <!-- Returns: only meaningful once something has been issued -->
+            <xpath expr="//button[@name='action_cancel']" position="before">
+                <button name="%(action_mr_return_wizard)d"
+                        string="Process Return"
+                        type="action"
+                        attrs="{'invisible': [('state', 'not in', ['issued','completed'])]}"/>
+            </xpath>
+
+            <!-- Fulfilment tracking page -->
+            <xpath expr="//page[@name='director']" position="after">
+                <page string="Fulfilment" name="fulfilment">
+                    <group>
+                        <group>
+                            <field name="total_requested_qty" readonly="1"/>
+                            <field name="total_approved_qty" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="total_issued_qty" readonly="1"/>
+                            <field name="total_pending_qty" readonly="1"/>
+                            <field name="fulfillment_rate" widget="progressbar" readonly="1"/>
+                            <field name="is_fully_issued" readonly="1"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

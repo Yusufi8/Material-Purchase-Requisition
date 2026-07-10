@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_purchase_requisition_all" model="ir.actions.act_window">
+        <field name="name">Purchase Requisitions</field>
+        <field name="res_model">purchase.requisition.request</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_purchase_requisition_pending" model="ir.actions.act_window">
+        <field name="name">Pending Approval</field>
+        <field name="res_model">purchase.requisition.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', 'in', ['submitted', 'purchase_manager_review'])]</field>
+    </record>
+
+    <record id="action_purchase_requisition_director_queue" model="ir.actions.act_window">
+        <field name="name">Director Approval Queue</field>
+        <field name="res_model">purchase.requisition.request</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('state', '=', 'director_approval')]</field>
+    </record>
+
+    <!-- Opens the shared ti_workflow_core approval wizard pre-set to Approve,
+         targeted at the current purchase.requisition.request record -->
+    <record id="action_pr_director_approve_wizard" model="ir.actions.act_window">
+        <field name="name">Director Approve</field>
+        <field name="res_model">ti.approval.action.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="ti_workflow_core.view_ti_approval_action_wizard_form"/>
+        <field name="target">new</field>
+        <field name="context">{'default_res_model': 'purchase.requisition.request', 'default_res_id': active_id, 'default_action_type': 'approve'}</field>
+    </record>
+
+    <record id="action_pr_director_reject_wizard" model="ir.actions.act_window">
+        <field name="name">Director Reject</field>
+        <field name="res_model">ti.approval.action.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="ti_workflow_core.view_ti_approval_action_wizard_form"/>
+        <field name="target">new</field>
+        <field name="context">{'default_res_model': 'purchase.requisition.request', 'default_res_id': active_id, 'default_action_type': 'reject'}</field>
+    </record>
+
+</odoo>

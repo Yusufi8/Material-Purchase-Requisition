@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Generic activity type used by ti.notification.rule records
+         across every operational module (MR submitted, PR awaiting
+         director approval, etc). Operational modules may reference this
+         or define their own more specific activity types.
+    ============================================================ -->
+
+    <record id="mail_activity_type_ti_workflow_action" model="mail.activity.type">
+        <field name="name">TI Workflow Action</field>
+        <field name="icon">fa-tasks</field>
+        <field name="category">default</field>
+        <field name="delay_count">1</field>
+        <field name="delay_unit">days</field>
+        <field name="summary">Action required on a TI workflow document</field>
+    </record>
+
+</odoo>

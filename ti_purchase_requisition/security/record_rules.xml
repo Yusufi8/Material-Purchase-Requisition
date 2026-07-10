@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         Purchase User sees requisitions once submitted (they should not
+         see drafts still being assembled by Inventory). No rule is
+         defined for Purchase Manager/Inventory Manager/Directors/Admin —
+         absence of a rule means unrestricted visibility, matching the
+         security model established in ti_material_requisition.
+    ============================================================ -->
+
+    <record id="rule_pr_purchase_user" model="ir.rule">
+        <field name="name">Purchase Requisition: Purchase User sees submitted+ only</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="domain_force">[('state', '!=', 'draft')]</field>
+        <field name="groups" eval="[(4, ref('ti_workflow_core.group_purchase_user'))]"/>
+        <field name="perm_read">1</field>
+        <field name="perm_write">1</field>
+        <field name="perm_unlink">1</field>
+        <field name="perm_create">0</field>
+    </record>
+
+</odoo>

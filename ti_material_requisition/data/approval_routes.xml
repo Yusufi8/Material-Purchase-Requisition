@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Either the Operations Director or the Managing Director may approve
+         a material shortage escalation — this route has no amount_field,
+         so it applies regardless of value. require_all_approvers=False
+         means any single approver from either group is sufficient. -->
+    <record id="route_mr_director_shortage_approval" model="ti.approval.route">
+        <field name="name">MR Director Approval — Shortage (Either Director)</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="state_from">director_approval_required</field>
+        <field name="state_to">director_approved</field>
+        <field name="approver_group_ids" eval="[(6, 0, [
+            ref('ti_workflow_core.group_operations_director'),
+            ref('ti_workflow_core.group_managing_director')
+        ])]"/>
+        <field name="require_all_approvers" eval="False"/>
+        <field name="sequence">10</field>
+        <field name="description">Either the Operations Director or the Managing Director may
+            approve a material shortage escalation, regardless of amount.</field>
+    </record>
+
+</odoo>

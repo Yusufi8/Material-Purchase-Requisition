@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ti_issue_materials_wizard_form" model="ir.ui.view">
+        <field name="name">ti.issue.materials.wizard.form</field>
+        <field name="model">ti.issue.materials.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Issue Materials (Partial)">
+
+                <div class="alert alert-info" role="alert" style="margin-bottom:16px;">
+                    <strong>Partial Issue</strong> — Only lines with remaining approved
+                    quantity are shown. Set <em>Issue Now</em> per line; you can run this
+                    again later for whatever remains.
+                </div>
+
+                <field name="mr_id" invisible="1"/>
+
+                <field name="line_ids" nolabel="1">
+                    <tree editable="bottom">
+                        <field name="mr_line_id" invisible="1"/>
+                        <field name="product_id" readonly="1"/>
+                        <field name="qty_approved" readonly="1"/>
+                        <field name="qty_already_issued" readonly="1"/>
+                        <field name="qty_remaining" readonly="1"/>
+                        <field name="qty_to_issue"/>
+                    </tree>
+                </field>
+
+                <footer>
+                    <button name="action_issue_partial"
+                            string="Issue"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+    <record id="view_ti_stock_return_wizard_form" model="ir.ui.view">
+        <field name="name">ti.stock.return.wizard.form</field>
+        <field name="model">ti.stock.return.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Process Return">
+
+                <div class="alert alert-info" role="alert" style="margin-bottom:16px;">
+                    <strong>Return to Stock</strong> — Only lines with issued quantity are
+                    shown. Set <em>Return Qty</em> per line for what is coming back.
+                </div>
+
+                <field name="mr_id" invisible="1"/>
+
+                <field name="line_ids" nolabel="1">
+                    <tree editable="bottom">
+                        <field name="mr_line_id" invisible="1"/>
+                        <field name="product_id" readonly="1"/>
+                        <field name="qty_issued" readonly="1"/>
+                        <field name="qty_to_return"/>
+                    </tree>
+                </field>
+
+                <footer>
+                    <button name="action_create_return"
+                            string="Create Return"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+</odoo>

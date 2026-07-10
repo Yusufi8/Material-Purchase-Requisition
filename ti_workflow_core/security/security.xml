@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         TI WORKFLOW CORE — SECURITY GROUPS
+         9 groups across Production, Inventory, Purchase, and Director
+         levels. Every operational module (MR, PR, Inventory, Procurement,
+         Dashboard) reuses these groups — none of them define new groups.
+
+         category_id is intentionally omitted from all groups below.
+         In Odoo 16 Community, app-level module categories (Purchase,
+         Manufacturing, Inventory) are created dynamically by each app and
+         do not have guaranteed stable external IDs that can be referenced
+         as base.module_category_*. Omitting category_id is safe — it is
+         cosmetic only (controls which section the group appears under in
+         Settings > Users & Companies). All permission logic is unaffected.
+    ============================================================ -->
+
+    <!-- 1. Production User — can view their own MRs, no approval rights -->
+    <record id="group_production_user" model="res.groups">
+        <field name="name">Production User</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- 2. Production Supervisor — creates and approves MRs for their department -->
+    <record id="group_production_supervisor" model="res.groups">
+        <field name="name">Production Supervisor</field>
+        <field name="implied_ids" eval="[(4, ref('group_production_user'))]"/>
+    </record>
+
+    <!-- 3. Inventory User — read-only visibility into requisitions -->
+    <record id="group_inventory_user" model="res.groups">
+        <field name="name">Inventory User</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- 4. Inventory Manager — reviews MRs, checks stock, issues materials, raises PRs -->
+    <record id="group_inventory_manager" model="res.groups">
+        <field name="name">Inventory Manager (Requisition)</field>
+        <field name="implied_ids" eval="[(4, ref('group_inventory_user'))]"/>
+    </record>
+
+    <!-- 5. Purchase User — works approved PRs into RFQs; inherits standard purchase rights -->
+    <record id="group_purchase_user" model="res.groups">
+        <field name="name">Purchase User (Requisition)</field>
+        <field name="implied_ids" eval="[(4, ref('purchase.group_purchase_user'))]"/>
+    </record>
+
+    <!-- 6. Purchase Manager — confirms POs, manages vendor comparison -->
+    <record id="group_purchase_manager" model="res.groups">
+        <field name="name">Purchase Manager (Requisition)</field>
+        <field name="implied_ids" eval="[(4, ref('purchase.group_purchase_manager')),
+                                          (4, ref('group_purchase_user'))]"/>
+    </record>
+
+    <!-- 7. Operations Director — approves PRs below the high-value threshold -->
+    <record id="group_operations_director" model="res.groups">
+        <field name="name">Operations Director</field>
+        <field name="implied_ids" eval="[(4, ref('group_purchase_manager'))]"/>
+    </record>
+
+    <!-- 8. Managing Director — approves PRs at or above the high-value threshold -->
+    <record id="group_managing_director" model="res.groups">
+        <field name="name">Managing Director</field>
+        <field name="implied_ids" eval="[(4, ref('group_operations_director'))]"/>
+    </record>
+
+    <!-- 9. System Administrator (Requisition) — configures approval routes & notifications -->
+    <record id="group_system_admin" model="res.groups">
+        <field name="name">System Administrator (Requisition)</field>
+        <field name="implied_ids" eval="[(4, ref('base.group_system'))]"/>
+    </record>
+
+</odoo>

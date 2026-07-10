@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- PR Amount < ₹2,00,000 → Operations Director may approve.
+         (A Managing Director user also implies membership in
+         group_operations_director per ti_workflow_core's group hierarchy,
+         so MDs can approve these too — correct, since higher authority
+         should not be locked out of smaller approvals.) -->
+    <record id="route_pr_director_approval_standard" model="ti.approval.route">
+        <field name="name">PR Director Approval — Standard (&lt; ₹2,00,000)</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="state_from">director_approval</field>
+        <field name="state_to">approved</field>
+        <field name="approver_group_ids" eval="[(6, 0, [ref('ti_workflow_core.group_operations_director')])]"/>
+        <field name="require_all_approvers" eval="False"/>
+        <field name="amount_field">estimated_cost</field>
+        <field name="amount_min">0</field>
+        <field name="amount_max">200000</field>
+        <field name="sequence">10</field>
+        <field name="description">Operations Director approves Purchase Requisitions estimated
+            under ₹2,00,000.</field>
+    </record>
+
+    <!-- PR Amount >= ₹2,00,000 → Managing Director must approve personally.
+         amount_max=0 means no upper limit, per ti.approval.route.matches(). -->
+    <record id="route_pr_director_approval_high_value" model="ti.approval.route">
+        <field name="name">PR Director Approval — High Value (&gt;= ₹2,00,000)</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="state_from">director_approval</field>
+        <field name="state_to">approved</field>
+        <field name="approver_group_ids" eval="[(6, 0, [ref('ti_workflow_core.group_managing_director')])]"/>
+        <field name="require_all_approvers" eval="False"/>
+        <field name="amount_field">estimated_cost</field>
+        <field name="amount_min">200000</field>
+        <field name="amount_max">0</field>
+        <field name="sequence">20</field>
+        <field name="description">Managing Director must personally approve Purchase
+            Requisitions at or above ₹2,00,000. To change this threshold, edit amount_min /
+            amount_max on these two routes — no code change required.</field>
+    </record>
+
+</odoo>

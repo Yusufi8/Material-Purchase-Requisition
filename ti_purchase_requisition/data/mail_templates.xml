@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="tpl_pr_submitted_purchase_manager" model="mail.template">
+        <field name="name">PR Submitted → Purchase Manager</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="subject">Purchase Requisition ${object.name} awaiting review</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear Purchase Manager,</p>
+                <p>Purchase Requisition <strong>${object.name}</strong> has been submitted and is
+                   awaiting your review.</p>
+                <p>
+                    Source MR: ${object.material_requisition_id.name or 'N/A'}<br/>
+                    Department: ${object.department_id.name or ''}<br/>
+                    Estimated Cost: ${object.estimated_cost}
+                </p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="tpl_pr_director_approval_required" model="mail.template">
+        <field name="name">PR Director Approval Required</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="subject">Action required: Purchase Requisition ${object.name} needs your approval</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear Director,</p>
+                <p>Purchase Requisition <strong>${object.name}</strong> is awaiting your approval.</p>
+                <p>
+                    Estimated Cost: ${object.estimated_cost}<br/>
+                    Department: ${object.department_id.name or ''}<br/>
+                    Requested By: ${object.requested_by.name}
+                </p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="tpl_pr_approved_purchase_team" model="mail.template">
+        <field name="name">PR Approved → Purchase Team</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="subject">Purchase Requisition ${object.name} approved — ready for RFQ</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear Purchase Team,</p>
+                <p>Purchase Requisition <strong>${object.name}</strong> has been approved and is
+                   ready for RFQ generation.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="tpl_pr_rfq_created" model="mail.template">
+        <field name="name">RFQ Created → Purchase Manager</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="subject">RFQ created for Purchase Requisition ${object.name}</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear Purchase Manager,</p>
+                <p>An RFQ has been generated for Purchase Requisition
+                   <strong>${object.name}</strong>. Please review and confirm the Purchase Order.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="tpl_pr_material_received_production" model="mail.template">
+        <field name="name">Material Received → Production</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="subject">Materials received for Purchase Requisition ${object.name}</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear ${object.requested_by.name},</p>
+                <p>Materials procured under Purchase Requisition <strong>${object.name}</strong>
+                   have been received. The linked Material Requisition can now be re-checked
+                   for issue.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+</odoo>

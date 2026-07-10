@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_purchase_requisition_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Purchase Requisition <span t-field="doc.name"/></h2>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <strong>Request Date:</strong> <span t-field="doc.request_date"/><br/>
+                                <strong>Required By:</strong> <span t-field="doc.required_date"/><br/>
+                                <strong>Department:</strong> <span t-field="doc.department_id.name"/><br/>
+                                <strong>Source MR:</strong> <span t-field="doc.material_requisition_id.name"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Requested By:</strong> <span t-field="doc.requested_by.name"/><br/>
+                                <strong>Status:</strong> <span t-field="doc.state"/><br/>
+                                <strong>Estimated Cost:</strong> <span t-field="doc.estimated_cost"/><br/>
+                                <strong>Actual Cost:</strong> <span t-field="doc.actual_cost"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm o_main_table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Description</th>
+                                    <th class="text-end">Required</th>
+                                    <th class="text-end">Available</th>
+                                    <th class="text-end">Shortage</th>
+                                    <th class="text-end">Est. Unit Cost</th>
+                                    <th class="text-end">Est. Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td><span t-field="line.product_id.display_name"/></td>
+                                    <td><span t-field="line.description"/></td>
+                                    <td class="text-end"><span t-field="line.requested_qty"/></td>
+                                    <td class="text-end"><span t-field="line.available_qty"/></td>
+                                    <td class="text-end"><span t-field="line.shortage_qty"/></td>
+                                    <td class="text-end"><span t-field="line.estimated_cost"/></td>
+                                    <td class="text-end"><span t-field="line.total_cost"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p t-if="doc.justification">
+                            <strong>Justification:</strong> <span t-field="doc.justification"/>
+                        </p>
+                        <p t-if="doc.director_id">
+                            <strong>Director Approval:</strong>
+                            <span t-field="doc.director_id.name"/> on
+                            <span t-field="doc.director_approval_date"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

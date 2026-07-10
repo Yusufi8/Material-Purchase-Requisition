@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ============================================================
+         PURCHASE  (purchase.menu_purchase_root)
+         Purchase Team: approve requisitions, generate RFQs
+    ============================================================ -->
+
+    <menuitem
+        id="menu_purchase_requisition_group"
+        name="Material Purchase Requisitions"
+        parent="purchase.menu_purchase_root"
+        sequence="65"/>
+
+    <menuitem
+        id="menu_purchase_pending_approval"
+        name="Pending Approval"
+        parent="menu_purchase_requisition_group"
+        action="action_purchase_requisition_pending"
+        sequence="10"/>
+
+    <menuitem
+        id="menu_purchase_director_queue"
+        name="Director Approval Queue"
+        parent="menu_purchase_requisition_group"
+        action="action_purchase_requisition_director_queue"
+        groups="ti_workflow_core.group_operations_director,ti_workflow_core.group_managing_director"
+        sequence="15"/>
+
+    <menuitem
+        id="menu_purchase_all_requisitions"
+        name="All Purchase Requisitions"
+        parent="menu_purchase_requisition_group"
+        action="action_purchase_requisition_all"
+        sequence="20"/>
+
+</odoo>

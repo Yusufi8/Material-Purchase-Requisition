@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- ====================================================
+         TREE / LIST VIEW
+    ==================================================== -->
+    <record id="view_material_requisition_tree" model="ir.ui.view">
+        <field name="name">material.requisition.tree</field>
+        <field name="model">material.requisition</field>
+        <field name="arch" type="xml">
+            <tree decoration-info="state == 'draft'"
+                  decoration-warning="state in ('submitted','supervisor_approved','inventory_review','partially_available','director_approval_required')"
+                  decoration-success="state in ('ready_to_issue','stock_reserved','director_approved','issued','completed')"
+                  decoration-danger="priority == '2'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="required_date"/>
+                <field name="department_id"/>
+                <field name="requested_by"/>
+                <field name="prepared_by" optional="hide"/>
+                <field name="priority" widget="badge"
+                       decoration-warning="priority == '1'"
+                       decoration-danger="priority == '2'"/>
+                <field name="director_approval_required" invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'draft'"
+                       decoration-warning="state in ('submitted','supervisor_approved','inventory_review','partially_available','director_approval_required')"
+                       decoration-success="state in ('ready_to_issue','stock_reserved','director_approved','issued','completed')"
+                       decoration-danger="state == 'cancelled'"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ====================================================
+         FORM VIEW
+    ==================================================== -->
+    <record id="view_material_requisition_form" model="ir.ui.view">
+        <field name="name">material.requisition.form</field>
+        <field name="model">material.requisition</field>
+        <field name="arch" type="xml">
+            <form string="Material Requisition">
+
+                <header>
+                    <!-- Production Supervisor -->
+                    <button name="action_submit"
+                            string="Submit to Inventory"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <button name="action_supervisor_approve"
+                            string="Supervisor Approve"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'submitted')]}"/>
+
+                    <!-- Inventory Manager -->
+                    <button name="action_set_inventory_review"
+                            string="Start Review"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'supervisor_approved')]}"/>
+                    <button name="action_check_availability"
+                            string="Check Availability"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', 'not in', ['inventory_review','director_approved'])]}"/>
+                    <button name="%(action_mr_inventory_review_wizard)d"
+                            string="Review &amp; Approve Qty"
+                            type="action"
+                            class="ti_mr_review_qty_btn"
+                            attrs="{'invisible': [('state', 'not in', ['inventory_review','director_approved'])]}"/>
+                    <button name="action_reserve_stock"
+                            string="Reserve Stock"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'ready_to_issue')]}"/>
+                    <button name="action_request_director_approval"
+                            string="Request Director Approval"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'partially_available')]}"/>
+                    <button name="action_issue_materials"
+                            string="Issue Materials"
+                            type="object"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', 'not in', ['ready_to_issue','stock_reserved','director_approved'])]}"/>
+                    <button name="action_mark_completed"
+                            string="Mark Completed"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'issued')]}"/>
+
+                    <!-- Director decisions: open the shared ti_workflow_core wizard -->
+                    <button name="%(action_mr_director_approve_wizard)d"
+                            string="Director Approve"
+                            type="action"
+                            class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'director_approval_required')]}"/>
+                    <button name="%(action_mr_director_reject_wizard)d"
+                            string="Director Reject"
+                            type="action"
+                            attrs="{'invisible': [('state', '!=', 'director_approval_required')]}"/>
+
+                    <!-- Always available -->
+                    <button name="action_cancel"
+                            string="Cancel"
+                            type="object"
+                            attrs="{'invisible': [('state', 'in', ['cancelled','completed'])]}"/>
+                    <button name="action_reset_draft"
+                            string="Reset to Draft"
+                            type="object"
+                            attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,submitted,supervisor_approved,inventory_review,ready_to_issue,issued,completed"/>
+                </header>
+
+                <sheet>
+                    <!-- Smart Buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_pickings"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                attrs="{'invisible': [('stock_picking_count', '=', 0)]}">
+                            <field name="stock_picking_count" widget="statinfo" string="Transfers"/>
+                        </button>
+                        <button name="action_view_audit_log"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-history">
+                            <field name="audit_log_count" widget="statinfo" string="Audit Log"/>
+                        </button>
+                        <button name="action_view_timeline"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-clock-o">
+                            <field name="timeline_count" widget="statinfo" string="Timeline"/>
+                        </button>
+                    </div>
+
+                    <widget name="web_ribbon" title="Director Approval Needed"
+                            bg_color="bg-danger"
+                            attrs="{'invisible': [('state', '!=', 'director_approval_required')]}"/>
+                    <widget name="web_ribbon" title="Cancelled"
+                            bg_color="bg-danger"
+                            attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Request Details">
+                            <field name="date"/>
+                            <field name="required_date"/>
+                            <field name="priority" widget="radio" widget_options="{'horizontal': true}"/>
+                            <field name="department_id"/>
+                        </group>
+                        <group string="Requested By">
+                            <field name="requested_by"
+                                   attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="prepared_by" readonly="1"/>
+                            <field name="supervisor_id"/>
+                        </group>
+                    </group>
+
+                    <group string="Business References">
+                        <group>
+                            <field name="sale_order_id"/>
+                            <field name="project_id"/>
+                        </group>
+                        <group>
+                            <field name="manufacturing_order_id"/>
+                            <field name="work_order_id"/>
+                            <field name="cost_center_id"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="remarks"
+                               placeholder="Describe the purpose of this request…"
+                               attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                    </group>
+
+                    <field name="director_approval_required" invisible="1"/>
+
+                    <notebook>
+                        <page string="Products Requested" name="products">
+                            <field name="line_ids"
+                                   attrs="{'readonly': [('state', 'not in', ['draft','inventory_review'])]}">
+                                <tree editable="bottom"
+                                      decoration-danger="shortage_qty > 0"
+                                      decoration-success="shortage_qty == 0 and qty_available > 0">
+                                    <field name="product_id"/>
+                                    <field name="description"/>
+                                    <field name="uom_id"/>
+                                    <field name="qty_requested"/>
+                                    <field name="qty_available" readonly="1"
+                                           decoration-success="qty_available >= qty_requested"
+                                           decoration-warning="qty_available &gt; 0 and qty_available &lt; qty_requested"
+                                           decoration-danger="qty_available == 0"/>
+                                    <field name="shortage_qty" readonly="1"/>
+                                    <field name="qty_approved"/>
+                                    <field name="qty_reserved" readonly="1"/>
+                                    <field name="qty_issued" readonly="1"/>
+                                    <field name="qty_pending" readonly="1"/>
+                                    <field name="estimated_cost" readonly="1" sum="Total Est. Cost"/>
+                                    <field name="fulfillment_status" widget="badge"
+                                           decoration-warning="fulfillment_status == 'pending'"
+                                           decoration-info="fulfillment_status == 'partial'"
+                                           decoration-success="fulfillment_status == 'full'"/>
+                                    <field name="state" invisible="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Director Approval" name="director"
+                              attrs="{'invisible': [('director_approval_required', '=', False)]}">
+                            <group>
+                                <group>
+                                    <field name="director_approval_status" widget="badge"
+                                           decoration-warning="director_approval_status == 'pending'"
+                                           decoration-success="director_approval_status == 'approved'"
+                                           decoration-danger="director_approval_status == 'rejected'"/>
+                                    <field name="director_approved_by"/>
+                                    <field name="director_approved_date"/>
+                                </group>
+                                <group>
+                                    <field name="director_remarks"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+
+            </form>
+        </field>
+    </record>
+
+    <!-- ====================================================
+         SEARCH VIEW
+    ==================================================== -->
+    <record id="view_material_requisition_search" model="ir.ui.view">
+        <field name="name">material.requisition.search</field>
+        <field name="model">material.requisition</field>
+        <field name="arch" type="xml">
+            <search string="Search Requisitions">
+                <field name="name" string="Requisition No"/>
+                <field name="requested_by"/>
+                <field name="prepared_by"/>
+                <field name="department_id"/>
+                <field name="sale_order_id"/>
+                <field name="project_id"/>
+                <separator/>
+                <filter name="my_requests" string="My Requests"
+                        domain="[('requested_by', '=', uid)]"/>
+                <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                <filter name="submitted" string="Submitted" domain="[('state','=','submitted')]"/>
+                <filter name="in_review" string="Under Review"
+                        domain="[('state','in',['inventory_review','partially_available'])]"/>
+                <filter name="director_queue" string="Awaiting Director"
+                        domain="[('state','=','director_approval_required')]"/>
+                <filter name="ready" string="Ready to Issue"
+                        domain="[('state','in',['ready_to_issue','stock_reserved'])]"/>
+                <filter name="issued" string="Issued" domain="[('state','=','issued')]"/>
+                <filter name="cancelled" string="Cancelled" domain="[('state','=','cancelled')]"/>
+                <separator/>
+                <filter name="urgent_critical" string="Urgent / Critical"
+                        domain="[('priority', 'in', ['1','2'])]"/>
+                <group expand="0" string="Group By">
+                    <filter name="grp_dept" string="Department" context="{'group_by': 'department_id'}"/>
+                    <filter name="grp_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="grp_user" string="Requested By" context="{'group_by': 'requested_by'}"/>
+                    <filter name="grp_prepared_by" string="Prepared By" context="{'group_by': 'prepared_by'}"/>
+                    <filter name="grp_priority" string="Priority" context="{'group_by': 'priority'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+</odoo>

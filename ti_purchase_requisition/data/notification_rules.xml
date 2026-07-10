@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="notif_pr_submitted" model="ti.notification.rule">
+        <field name="name">PR Submitted → Purchase Manager</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="trigger_state">submitted</field>
+        <field name="recipient_type">group</field>
+        <field name="recipient_group_ids" eval="[(6, 0, [ref('ti_workflow_core.group_purchase_manager')])]"/>
+        <field name="email_template_id" ref="tpl_pr_submitted_purchase_manager"/>
+        <field name="send_activity" eval="True"/>
+        <field name="activity_type_id" ref="ti_workflow_core.mail_activity_type_ti_workflow_action"/>
+        <field name="activity_note_template">New purchase requisition awaiting your review.</field>
+    </record>
+
+    <record id="notif_pr_director_approval" model="ti.notification.rule">
+        <field name="name">PR Awaiting Director Approval</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="trigger_state">director_approval</field>
+        <field name="recipient_type">group</field>
+        <field name="recipient_group_ids" eval="[(6, 0, [
+            ref('ti_workflow_core.group_operations_director'),
+            ref('ti_workflow_core.group_managing_director')
+        ])]"/>
+        <field name="email_template_id" ref="tpl_pr_director_approval_required"/>
+        <field name="send_activity" eval="True"/>
+        <field name="activity_type_id" ref="ti_workflow_core.mail_activity_type_ti_workflow_action"/>
+        <field name="activity_note_template">Purchase requisition awaiting your approval.</field>
+    </record>
+
+    <record id="notif_pr_approved" model="ti.notification.rule">
+        <field name="name">PR Approved → Purchase Team</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="trigger_state">approved</field>
+        <field name="recipient_type">group</field>
+        <field name="recipient_group_ids" eval="[(6, 0, [ref('ti_workflow_core.group_purchase_user')])]"/>
+        <field name="email_template_id" ref="tpl_pr_approved_purchase_team"/>
+        <field name="send_activity" eval="False"/>
+    </record>
+
+    <record id="notif_pr_rfq_created" model="ti.notification.rule">
+        <field name="name">RFQ Created → Purchase Manager</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="trigger_state">rfq_created</field>
+        <field name="recipient_type">group</field>
+        <field name="recipient_group_ids" eval="[(6, 0, [ref('ti_workflow_core.group_purchase_manager')])]"/>
+        <field name="email_template_id" ref="tpl_pr_rfq_created"/>
+        <field name="send_activity" eval="False"/>
+    </record>
+
+    <record id="notif_pr_received" model="ti.notification.rule">
+        <field name="name">Material Received → Requester</field>
+        <field name="model_id" ref="model_purchase_requisition_request"/>
+        <field name="trigger_state">received</field>
+        <field name="recipient_type">user_field</field>
+        <field name="recipient_field">requested_by</field>
+        <field name="email_template_id" ref="tpl_pr_material_received_production"/>
+        <field name="send_activity" eval="False"/>
+    </record>
+
+</odoo>

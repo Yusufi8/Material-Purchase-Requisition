@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_ti_inventory_review_wizard_form" model="ir.ui.view">
+        <field name="name">ti.inventory.review.wizard.form</field>
+        <field name="model">ti.inventory.review.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Inventory Review">
+
+                <div class="alert alert-info" role="alert" style="margin-bottom:16px;">
+                    <strong>Manual Review</strong> — System on-hand stock is shown for reference.
+                    Adjust <em>Approve Qty</em> per line if you need to hold back stock reserved
+                    for another requisition, then confirm.
+                </div>
+
+                <field name="mr_id" invisible="1"/>
+
+                <field name="line_ids" nolabel="1">
+                    <tree editable="bottom">
+                        <field name="mr_line_id" invisible="1"/>
+                        <field name="product_id" readonly="1"/>
+                        <field name="qty_requested" readonly="1"/>
+                        <field name="qty_available" string="System On-Hand" readonly="1"
+                               decoration-danger="qty_available == 0"
+                               decoration-success="qty_available > 0"/>
+                        <field name="qty_approved"/>
+                    </tree>
+                </field>
+
+                <footer>
+                    <button name="action_confirm_review"
+                            string="Confirm Review"
+                            type="object"
+                            class="btn-primary"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+</odoo>

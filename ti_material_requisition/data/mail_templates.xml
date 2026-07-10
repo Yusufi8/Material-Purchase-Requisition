@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="tpl_mr_submitted_supervisor" model="mail.template">
+        <field name="name">MR Submitted → Supervisor</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="subject">Material Requisition ${object.name} awaiting your approval</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear Supervisor,</p>
+                <p>Material Requisition <strong>${object.name}</strong> has been submitted by
+                   ${object.requested_by.name} and is awaiting your approval.</p>
+                <p>
+                    Department: ${object.department_id.name or ''}<br/>
+                    Required By: ${object.required_date or ''}<br/>
+                    Priority: ${dict(object._fields['priority'].selection).get(object.priority, '')}
+                </p>
+                <p>Please review it in the system.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="tpl_mr_supervisor_approved_inventory" model="mail.template">
+        <field name="name">MR Supervisor Approved → Inventory</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="subject">Material Requisition ${object.name} ready for inventory review</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear Inventory Manager,</p>
+                <p>Material Requisition <strong>${object.name}</strong> has been approved by the
+                   Production Supervisor and is ready for your review.</p>
+                <p>
+                    Department: ${object.department_id.name or ''}<br/>
+                    Required By: ${object.required_date or ''}
+                </p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="tpl_mr_director_approval_required" model="mail.template">
+        <field name="name">MR Shortage → Director Approval Required</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="subject">Action required: material shortage on ${object.name}</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear Director,</p>
+                <p>A material shortage has been found on Material Requisition
+                   <strong>${object.name}</strong> and requires your approval before
+                   procurement can proceed.</p>
+                <p>
+                    Department: ${object.department_id.name or ''}<br/>
+                    Requested By: ${object.requested_by.name}<br/>
+                    Required By: ${object.required_date or ''}
+                </p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="tpl_mr_director_approved_inventory" model="mail.template">
+        <field name="name">MR Director Approved → Inventory</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="subject">Director approved shortage on ${object.name}</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear Inventory Manager,</p>
+                <p>The material shortage on Material Requisition <strong>${object.name}</strong>
+                   has been approved by the Director. You may proceed with procurement or partial
+                   issue as applicable.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+    <record id="tpl_mr_issued_production" model="mail.template">
+        <field name="name">MR Issued → Production</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="subject">Materials issued for ${object.name}</field>
+        <field name="body_html" type="html">
+            <div>
+                <p>Dear ${object.requested_by.name},</p>
+                <p>Materials for your requisition <strong>${object.name}</strong> have been
+                   issued. Please coordinate with the Inventory team to collect them.</p>
+            </div>
+        </field>
+        <field name="auto_delete" eval="True"/>
+    </record>
+
+</odoo>

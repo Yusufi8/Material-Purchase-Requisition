@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_material_requisition_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Material Requisition <span t-field="doc.name"/></h2>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <strong>Date:</strong> <span t-field="doc.date"/><br/>
+                                <strong>Required By:</strong> <span t-field="doc.required_date"/><br/>
+                                <strong>Department:</strong> <span t-field="doc.department_id.name"/><br/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Requested By:</strong> <span t-field="doc.requested_by.name"/><br/>
+                                <strong>Status:</strong> <span t-field="doc.state"/><br/>
+                                <strong>Priority:</strong>
+                                <span t-esc="dict(doc._fields['priority'].selection).get(doc.priority, '')"/>
+                            </div>
+                        </div>
+
+                        <table class="table table-sm o_main_table mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Description</th>
+                                    <th class="text-end">Requested</th>
+                                    <th class="text-end">Available</th>
+                                    <th class="text-end">Approved</th>
+                                    <th class="text-end">Issued</th>
+                                    <th class="text-end">Shortage</th>
+                                    <th class="text-end">Est. Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="doc.line_ids" t-as="line">
+                                    <td><span t-field="line.product_id.display_name"/></td>
+                                    <td><span t-field="line.description"/></td>
+                                    <td class="text-end"><span t-field="line.qty_requested"/></td>
+                                    <td class="text-end"><span t-field="line.qty_available"/></td>
+                                    <td class="text-end"><span t-field="line.qty_approved"/></td>
+                                    <td class="text-end"><span t-field="line.qty_issued"/></td>
+                                    <td class="text-end"><span t-field="line.shortage_qty"/></td>
+                                    <td class="text-end"><span t-field="line.estimated_cost"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <p t-if="doc.remarks">
+                            <strong>Remarks:</strong> <span t-field="doc.remarks"/>
+                        </p>
+                        <p t-if="doc.director_approval_required">
+                            <strong>Director Approval Status:</strong>
+                            <span t-esc="dict(doc._fields['director_approval_status'].selection).get(doc.director_approval_status, '')"/>
+                        </p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

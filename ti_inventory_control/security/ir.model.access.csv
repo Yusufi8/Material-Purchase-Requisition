@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_ti_issue_wizard_inventory_manager,ti.issue.wizard.inventory.manager,model_ti_issue_materials_wizard,ti_workflow_core.group_inventory_manager,1,1,1,1
+access_ti_issue_wizard_system_admin,ti.issue.wizard.system.admin,model_ti_issue_materials_wizard,ti_workflow_core.group_system_admin,1,1,1,1
+access_ti_issue_wizard_line_inventory_manager,ti.issue.wizard.line.inventory.manager,model_ti_issue_materials_wizard_line,ti_workflow_core.group_inventory_manager,1,1,1,1
+access_ti_issue_wizard_line_system_admin,ti.issue.wizard.line.system.admin,model_ti_issue_materials_wizard_line,ti_workflow_core.group_system_admin,1,1,1,1
+access_ti_return_wizard_inventory_manager,ti.return.wizard.inventory.manager,model_ti_stock_return_wizard,ti_workflow_core.group_inventory_manager,1,1,1,1
+access_ti_return_wizard_system_admin,ti.return.wizard.system.admin,model_ti_stock_return_wizard,ti_workflow_core.group_system_admin,1,1,1,1
+access_ti_return_wizard_line_inventory_manager,ti.return.wizard.line.inventory.manager,model_ti_stock_return_wizard_line,ti_workflow_core.group_inventory_manager,1,1,1,1
+access_ti_return_wizard_line_system_admin,ti.return.wizard.line.system.admin,model_ti_stock_return_wizard_line,ti_workflow_core.group_system_admin,1,1,1,1

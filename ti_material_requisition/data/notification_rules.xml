@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="notif_mr_submitted" model="ti.notification.rule">
+        <field name="name">MR Submitted → Supervisor</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="trigger_state">submitted</field>
+        <field name="recipient_type">group</field>
+        <field name="recipient_group_ids" eval="[(6, 0, [ref('ti_workflow_core.group_production_supervisor')])]"/>
+        <field name="email_template_id" ref="tpl_mr_submitted_supervisor"/>
+        <field name="send_activity" eval="True"/>
+        <field name="activity_type_id" ref="ti_workflow_core.mail_activity_type_ti_workflow_action"/>
+        <field name="activity_note_template">New material requisition awaiting your approval.</field>
+    </record>
+
+    <record id="notif_mr_supervisor_approved" model="ti.notification.rule">
+        <field name="name">MR Supervisor Approved → Inventory</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="trigger_state">supervisor_approved</field>
+        <field name="recipient_type">group</field>
+        <field name="recipient_group_ids" eval="[(6, 0, [ref('ti_workflow_core.group_inventory_manager')])]"/>
+        <field name="email_template_id" ref="tpl_mr_supervisor_approved_inventory"/>
+        <field name="send_activity" eval="True"/>
+        <field name="activity_type_id" ref="ti_workflow_core.mail_activity_type_ti_workflow_action"/>
+        <field name="activity_note_template">Requisition approved by supervisor — ready for inventory review.</field>
+    </record>
+
+    <record id="notif_mr_director_approval_required" model="ti.notification.rule">
+        <field name="name">MR Shortage → Directors</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="trigger_state">director_approval_required</field>
+        <field name="recipient_type">group</field>
+        <field name="recipient_group_ids" eval="[(6, 0, [
+            ref('ti_workflow_core.group_operations_director'),
+            ref('ti_workflow_core.group_managing_director')
+        ])]"/>
+        <field name="email_template_id" ref="tpl_mr_director_approval_required"/>
+        <field name="send_activity" eval="True"/>
+        <field name="activity_type_id" ref="ti_workflow_core.mail_activity_type_ti_workflow_action"/>
+        <field name="activity_note_template">Material shortage requires your approval.</field>
+    </record>
+
+    <record id="notif_mr_director_approved" model="ti.notification.rule">
+        <field name="name">MR Director Approved → Inventory</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="trigger_state">director_approved</field>
+        <field name="recipient_type">group</field>
+        <field name="recipient_group_ids" eval="[(6, 0, [ref('ti_workflow_core.group_inventory_manager')])]"/>
+        <field name="email_template_id" ref="tpl_mr_director_approved_inventory"/>
+        <field name="send_activity" eval="False"/>
+    </record>
+
+    <record id="notif_mr_issued" model="ti.notification.rule">
+        <field name="name">MR Issued → Requester</field>
+        <field name="model_id" ref="model_material_requisition"/>
+        <field name="trigger_state">issued</field>
+        <field name="recipient_type">user_field</field>
+        <field name="recipient_field">requested_by</field>
+        <field name="email_template_id" ref="tpl_mr_issued_production"/>
+        <field name="send_activity" eval="False"/>
+    </record>
+
+</odoo>

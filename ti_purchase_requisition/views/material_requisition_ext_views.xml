@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_material_requisition_form_inherit_pr" model="ir.ui.view">
+        <field name="name">material.requisition.form.inherit.pr</field>
+        <field name="model">material.requisition</field>
+        <field name="inherit_id" ref="ti_material_requisition.view_material_requisition_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Smart button: Purchase Requisitions raised from this MR -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_purchase_requisitions"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-shopping-cart"
+                        attrs="{'invisible': [('purchase_requisition_count', '=', 0)]}">
+                    <field name="purchase_requisition_count" widget="statinfo" string="Purchase Reqs"/>
+                </button>
+            </xpath>
+
+            <!-- Header button: create the PR once a Director has approved the shortage -->
+            <xpath expr="//button[@name='action_mark_completed']" position="after">
+                <button name="action_create_purchase_requisition"
+                        string="Request Purchase"
+                        type="object"
+                        class="btn-primary"
+                        attrs="{'invisible': ['|', ('state', '!=', 'director_approved'), ('purchase_requisition_count', '>', 0)]}"/>
+            </xpath>
+
+            <!-- Broaden the two availability-check buttons so Inventory can
+                 re-run availability once the linked PR's shortage has been
+                 received (state purchase_requisition_created). The second
+                 button is matched via hasclass() rather than @name, since
+                 its name is a dynamic action reference that gets resolved
+                 to a plain numeric database ID when the base module's view
+                 is loaded — that reference text no longer exists to match
+                 against from an inheriting view like this one. Matching by
+                 the 'string' (label) attribute is not an option either:
+                 Odoo's view inheritance validator explicitly disallows
+                 'string' as a selector, since it is a translated value and
+                 would silently break on any non-English installation. -->
+            <xpath expr="//button[@name='action_check_availability']" position="attributes">
+                <attribute name="attrs">{'invisible': [('state', 'not in', ['inventory_review','director_approved','purchase_requisition_created'])]}</attribute>
+            </xpath>
+            <xpath expr="//button[hasclass('ti_mr_review_qty_btn')]" position="attributes">
+                <attribute name="attrs">{'invisible': [('state', 'not in', ['inventory_review','director_approved','purchase_requisition_created'])]}</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

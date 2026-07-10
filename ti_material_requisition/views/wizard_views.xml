@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_mr_request_wizard_form" model="ir.ui.view">
+        <field name="name">mr.request.wizard.form</field>
+        <field name="model">mr.request.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Request Materials">
+
+                <div class="alert alert-info" role="alert"
+                     style="margin-bottom:16px;">
+                    <strong>Quick Material Request</strong> — Fill in the products
+                    you need and click <em>Submit Request</em> to notify the
+                    Inventory team immediately, or <em>Save as Draft</em> to
+                    review before sending.
+                </div>
+
+                <group>
+                    <group string="Request Details">
+                        <field name="department_id" required="1"/>
+                        <field name="required_date" required="1"/>
+                        <field name="priority" widget="radio" widget_options="{'horizontal': true}"/>
+                    </group>
+                    <group string="Purpose">
+                        <field name="remarks"
+                               placeholder="Why do you need these materials?"
+                               nolabel="1"
+                               colspan="2"/>
+                    </group>
+                </group>
+
+                <group string="Business References (Optional)">
+                    <group>
+                        <field name="sale_order_id"/>
+                        <field name="project_id"/>
+                    </group>
+                    <group>
+                        <field name="manufacturing_order_id"/>
+                        <field name="work_order_id"/>
+                    </group>
+                </group>
+
+                <separator string="Products Required"/>
+
+                <field name="line_ids" nolabel="1">
+                    <tree editable="bottom"
+                          decoration-warning="qty_on_hand == 0"
+                          decoration-success="qty_on_hand >= qty_requested">
+                        <field name="product_id" string="Product" required="1"/>
+                        <field name="uom_id" string="Unit"/>
+                        <field name="qty_requested" string="Qty Needed"/>
+                        <field name="qty_on_hand" string="Currently In Stock" readonly="1"
+                               decoration-danger="qty_on_hand == 0"
+                               decoration-success="qty_on_hand > 0"/>
+                    </tree>
+                </field>
+
+                <footer>
+                    <button name="action_submit_request"
+                            string="✔  Submit Request"
+                            type="object"
+                            class="btn-primary"/>
+                    <button name="action_save_draft"
+                            string="Save as Draft"
+                            type="object"
+                            class="btn-secondary"/>
+                    <button string="Discard"
+                            class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+
+            </form>
+        </field>
+    </record>
+
+</odoo>

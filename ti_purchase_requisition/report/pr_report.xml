@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_purchase_requisition" model="ir.actions.report">
+        <field name="name">Purchase Requisition</field>
+        <field name="model">purchase.requisition.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ti_purchase_requisition.report_purchase_requisition_document</field>
+        <field name="report_file">ti_purchase_requisition.report_purchase_requisition_document</field>
+        <field name="print_report_name">'Purchase Requisition - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_purchase_requisition_request"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>
