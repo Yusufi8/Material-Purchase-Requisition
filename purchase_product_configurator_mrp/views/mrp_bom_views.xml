@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Odoo 16 renders BOM components as an editable bom_line_ids tree. The
+         standard product_id remains the stored component; this field is only
+         the template selection entry point. -->
+    <record id="view_mrp_bom_form_product_configurator" model="ir.ui.view">
+        <field name="name">mrp.bom.form.product.configurator</field>
+        <field name="model">mrp.bom</field>
+        <field name="inherit_id" ref="mrp.mrp_bom_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='bom_line_ids']//tree//field[@name='product_id']" position="before">
+                <field name="configurator_product_template_id" string="Product Template"
+                       widget="product_template_configurator"
+                       options="{'product_field': 'product_id', 'quantity_field': 'product_qty'}"
+                       required="1"/>
+            </xpath>
+            <xpath expr="//field[@name='bom_line_ids']//tree//field[@name='product_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

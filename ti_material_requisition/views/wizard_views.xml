@@ -46,7 +46,11 @@
                     <tree editable="bottom"
                           decoration-warning="qty_on_hand == 0"
                           decoration-success="qty_on_hand >= qty_requested">
-                        <field name="product_id" string="Product" required="1"/>
+                        <field name="product_template_id" string="Product Template"
+                               widget="product_template_configurator"
+                               options="{'product_field': 'product_id', 'quantity_field': 'qty_requested'}"
+                               required="1"/>
+                        <field name="product_id" string="Configured Variant" readonly="1"/>
                         <field name="uom_id" string="Unit"/>
                         <field name="qty_requested" string="Qty Needed"/>
                         <field name="qty_on_hand" string="Currently In Stock" readonly="1"

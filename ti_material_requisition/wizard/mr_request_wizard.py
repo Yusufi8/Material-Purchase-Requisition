@@ -1,5 +1,5 @@
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class MrRequestWizard(models.TransientModel):
@@ -57,6 +57,11 @@ class MrRequestWizard(models.TransientModel):
     def _validate(self):
         if not self.line_ids:
             raise UserError(_('Please add at least one product before proceeding.'))
+        invalid_lines = self.line_ids.filtered(lambda line: not line.product_id)
+        if invalid_lines:
+            raise UserError(
+                _('Configure or select an exact product variant on every requested line.')
+            )
 
     def _build_requisition(self):
         line_vals = [
@@ -98,6 +103,10 @@ class MrRequestWizardLine(models.TransientModel):
     wizard_id = fields.Many2one(
         'mr.request.wizard', required=True, ondelete='cascade',
     )
+    product_template_id = fields.Many2one(
+        'product.template', string='Product Template',
+        help='Selection entry point for the shared variant configurator.',
+    )
     product_id = fields.Many2one('product.product', string='Product', required=True)
     uom_id = fields.Many2one('uom.uom', string='Unit')
     qty_requested = fields.Float(string='Quantity Needed', required=True, default=1.0)
@@ -108,7 +117,24 @@ class MrRequestWizardLine(models.TransientModel):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         if self.product_id:
+            self.product_template_id = self.product_id.product_tmpl_id
             self.uom_id = self.product_id.uom_id
+
+    @api.constrains('product_template_id', 'product_id')
+    def _check_product_matches_template(self):
+        for line in self:
+            if line.product_template_id and line.product_id and (
+                line.product_id.product_tmpl_id != line.product_template_id
+            ):
+                raise ValidationError(
+                    _('The selected product variant must belong to the selected product template.')
+                )
+
+    @api.constrains('qty_requested')
+    def _check_requested_quantity(self):
+        for line in self:
+            if line.qty_requested <= 0:
+                raise ValidationError(_('Quantity Needed must be greater than zero.'))
 
     @api.depends('product_id')
     def _compute_on_hand(self):
