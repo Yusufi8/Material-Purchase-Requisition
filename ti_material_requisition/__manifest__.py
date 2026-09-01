@@ -34,6 +34,7 @@ unlock that step.
         'stock',
         'hr',
         'project',
+        'purchase_product_configurator',
     ],
     'data': [
         'security/record_rules.xml',
